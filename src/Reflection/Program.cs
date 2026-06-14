@@ -4,10 +4,29 @@ using System.Reflection;
 
 
 Console.WriteLine("Please choose an option: ");
-Console.WriteLine("1) Book ");
-Console.WriteLine("2) Camera ");
 
-string choice = Console.ReadLine().ToUpper();
+//Product product = new Product(2, "Generic Product", 29.99);
+//Type type = product.GetType();
+
+//foreach (PropertyInfo pi in type.GetProperties())
+//    Console.WriteLine(pi);
+
+Type t = typeof(Product);
+
+Assembly a = Assembly.GetExecutingAssembly();
+Type[] types = a.GetTypes();
+
+List<Type> childs = types.Where(type => type.IsSubclassOf(t)).ToList();
+
+for (int i = 1; i <= childs.Count; i++)
+{
+    Console.WriteLine($"{i}) {childs[i - 1].Name}");
+}
+
+//Console.WriteLine("1) Book ");
+//Console.WriteLine("2) Camera ");
+
+string choice = Console.ReadLine();
 
 if(choice.Equals("1"))
 {
