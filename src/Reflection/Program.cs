@@ -2,19 +2,14 @@
 using Reflection;
 using System.Reflection;
 
-
 Console.WriteLine("Please choose an option: ");
-
-//Product product = new Product(2, "Generic Product", 29.99);
-//Type type = product.GetType();
-
-//foreach (PropertyInfo pi in type.GetProperties())
-//    Console.WriteLine(pi);
 
 Type t = typeof(Product);
 
-Assembly a = Assembly.GetExecutingAssembly();
-Type[] types = a.GetTypes();
+Assembly executing = Assembly.GetExecutingAssembly();
+Type[] types = executing.GetTypes();
+
+#region reflection callinf process
 
 List<Type> childs = types.Where(type => type.IsSubclassOf(t)).ToList();
 
@@ -23,27 +18,61 @@ for (int i = 1; i <= childs.Count; i++)
     Console.WriteLine($"{i}) {childs[i - 1].Name}");
 }
 
-//Console.WriteLine("1) Book ");
-//Console.WriteLine("2) Camera ");
-
 string choice = Console.ReadLine();
 
-if(choice.Equals("1"))
+bool found = false;
+
+for(int i = 0; i < childs.Count; i++)
 {
-    var book = new Book(1, "C# program", 120.70);
-    Console.WriteLine($"Original Price {book.Price}");
-    Console.WriteLine($"DiscountedPtice (10% off): {book.GetDiscountedPrice(20)}");
+    if(choice == childs[i].Name)
+    {
+        found = true;
+        ConstructorInfo constructor = childs[i].GetConstructor(new Type[] { typeof(int), 
+            typeof(string), typeof(double) });
+
+        if(constructor is not null)
+        {
+            object obj = constructor.Invoke(new object[] { 1, "sample product", 1600.00 });
+            MethodInfo method = childs[i].GetMethod("GetDiscountedPrice", 
+                BindingFlags.Public | BindingFlags.Instance, new Type[] { typeof(double) });
+
+            PropertyInfo property = childs[i].GetProperty("Price");
+            object price = property.GetValue(obj);
+
+            Console.WriteLine($"Original price: {price}");
+            object result = method.Invoke(obj, new object[] { 20 });
+            Console.WriteLine($"Discount price (20% off): {result}");
+        }
+        break;
+    }        
 }
-else if(choice.Equals("2"))
-{
-    var camera = new Camera(1, "DSLR Camera", 230.26);
-    Console.WriteLine($"Original Price: {camera.Price}");
-    Console.WriteLine($"Discount Price: {camera.GetDiscountedPrice(10)}");
-}
-else
+Console.WriteLine();
+ 
+if(!found)
 {
     Console.WriteLine("Invalid choice");
 }
 
+#endregion
+
+#region other reflection calling
+
+foreach(var item in types)
+{
+    Console.WriteLine();
+    Console.WriteLine($"--> Class -->: {item.Name}");
+    MethodInfo[] methods = item.GetMethods();
+    foreach(var method in methods)
+    {
+        Console.WriteLine($"-->Method: {method.Name}");
+        ParameterInfo[] parameter = method.GetParameters();
+        foreach( var param in parameter)
+        {
+            Console.WriteLine($"--->Parameter: {param.Name}, Type: {param.ParameterType}");
+        }
+    }
+}
+
+#endregion
 
 Console.WriteLine("Completed");
