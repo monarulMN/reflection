@@ -1,3 +1,4 @@
 <Solution>
+  <Project Path="src/DesignPattern/DesignPattern.csproj" Id="605a18b8-e24c-4c69-a731-16e6e58d55dd" />
   <Project Path="src/Reflection/Reflection.csproj" Id="0a8ff021-a129-49f1-bd02-25e37ade45d6" />
 </Solution>
